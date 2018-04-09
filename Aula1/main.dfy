@@ -62,7 +62,7 @@ method CompareTo(x:int, y:int) returns (c:int)
     else if x < y
         { c:= -1;}
     else
-        {c := 0;}
+        { c:= 0;}
     
 }
 

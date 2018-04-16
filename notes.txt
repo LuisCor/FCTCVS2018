@@ -1,0 +1,50 @@
+-personDB tem array de person.  
+
+persons.array (Row?)
+Count.int
+- Boolean a dizer se fez ou não, pós conditions
+
+
+Person
+Id: -1 ou n (count)
+Name:
+Age:
+Apontador DB: aponto para personDB
+
+Se fizer delete continuo com o objecto sem ID
+Set/get em qualquer estado
+Save também no persistente
+Close, fechar conexãoo à base de dados, offline, (o objecto mantem se em memória e na DB?)
+Update, online again
+
+
+personDB.find(id) -> person no estado persistente
+Id -> posição no array
+
+save(db)
+db.savePerson(this.name, this.age) -> devolve o ID
+
+
+Todas sao feitas no person e depois no DB, so o find é que é no DB
+New é o constructor
+
+Save/update tem DB no arg
+New não tem porque ainda não é persistente
+
+So quando faz save é que tem ID
+
+Row -> linha da tabela, clone??, classe diferente para os objectos que estão na base de dados
+
+Quando se faz save, nao passar referencias, criar um novo row?
+
+Class Row {
+Var name.String
+Var age.int
+}
+
+Transient nao tem ID, nem conexão
+Persistente tem as duas coisas
+Detached tem ID, nao tem conexão
+
+
+Metodos BD - find e cada um dos métodos da person encapsulados

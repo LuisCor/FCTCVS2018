@@ -25,18 +25,21 @@ class Row {
 
 class PersonDB
 {
-	var people:array?<Row>;
+	var people:array<Row?>;
  	var size:int; 
 
     constructor() 
     {
-        people := new Row?[10];
+        people := new Row?[10]; 
         size := 0;
     }
 
     method add() returns(pos:int)
-    modifies this.people
-    requires this.size < this.people.Length
+    modifies this.people, this`size  // use ` to modify a variable, . for objects or collections
+	//requires this.people != null
+	//requires this.people != null
+	//ensures pos < this.people.Length
+    ensures size < this.people.Length	//people array cannot be full
     {
         if( 0 <= size < people.Length ) 
         {
@@ -100,6 +103,7 @@ class Person
  	modifies this
  	requires this.name.Length > 0
  	requires this.age >= 0
+	requires c.people != null
  	requires c.size < c.people.Length
  	requires Transient() || Persitent()
  	ensures Persitent()

@@ -39,14 +39,17 @@ class PersonDB
 	//requires this.people != null
 	//requires this.people != null
 	//ensures pos < this.people.Length
-    ensures size < this.people.Length	//people array cannot be full
+    requires size < this.people.Length	//people array cannot be full
+    ensures pos > -1 ==> pos < people.Length
+    ensures pos > -1 ==> people[pos] != null 
     {
+        pos := -1;
         if( 0 <= size < people.Length ) 
         {
             people[size] := new Row();
+            pos := size;
             size := size + 1;
         }
-        pos := size-1;
     }
 
     method delete(i:int) 
@@ -58,8 +61,8 @@ class PersonDB
         }
     }
 
-    method find(i:int) returns (p:Person)
-    requires 0 < i < size    
+    method find(i:int) returns (p:Person?)
+    requires 0 <= i < size < people.Length  
  	{
  		p := null;
  		if( people[i] != null)
@@ -81,11 +84,11 @@ class Person
 	var id:int;
  	var name:array<char>; 
 	var age:int;
-	var con:PersonDB;
+	var con:PersonDB?;
 
  	function Transient():bool
  	reads this
- 	{ con == null && id == -1 }
+ 	{ id == -1 }
  	
  	function Persitent():bool
  	reads this
@@ -100,23 +103,32 @@ class Person
  	{ id := -1; name := new char[0]; age := 0; con := null; }
 
  	method save(c:PersonDB)
- 	modifies this
+    requires c != null ==> this.con != null
+ 	modifies this`id, this`con, con.people
  	requires this.name.Length > 0
  	requires this.age >= 0
-	requires c.people != null
+    requires c.size < c.people.Length
  	requires c.size < c.people.Length
  	requires Transient() || Persitent()
  	ensures Persitent()
  	{	
- 		var pos := c.add();
- 		c.people[pos].setName(this.name);
- 		c.people[pos].setAge(this.age);
- 		this.id := pos;
- 		this.con := c;
+        var pos:= this.id;
+        this.con := c;
+        if(this.id < 0)
+        {
+ 	       pos := con.add();
+        }
+     	con.people[pos].setName(this.name);
+     	con.people[pos].setAge(this.age);
+     	this.id := pos;
+         	
  	}
 
  	method delete()
- 	modifies this
+    requires this.con != null
+    requires 0 <= this.id < this.con.people.Length
+    requires this.con.people[this.id] != null
+ 	modifies this`con, this`id, con.people
  	requires Persitent()
  	ensures Transient()
  	{
@@ -125,6 +137,7 @@ class Person
  	}
 
  	method close(c:PersonDB)
+    modifies this`con
  	requires Persitent()
  	ensures Detatched()
  	{
@@ -132,7 +145,8 @@ class Person
  	}
 
  	method update(c:PersonDB)
- 	modifies this
+ 	modifies this`con
+    requires Detatched()
  	ensures Persitent()
  	{
  		this.con := c;

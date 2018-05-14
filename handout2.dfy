@@ -41,18 +41,29 @@ class PersonDB
 	//requires this.people != null
 	//requires this.people != null
 	//ensures pos < this.people.Length
+<<<<<<< HEAD
     ensures size <= this.people.Length	//people array cannot be full
+=======
+    requires size < this.people.Length	//people array cannot be full
+    ensures pos > -1 ==> pos < people.Length
+    ensures pos > -1 ==> people[pos] != null 
+>>>>>>> 99ec51ea5db7f31d349cbb7174c8f6d00c6273e6
     {
+        pos := -1;
         if( 0 <= size < people.Length ) 
         {
             people[size] := new Row();
+            pos := size;
             size := size + 1;
         }
+<<<<<<< HEAD
 		if( size >= people.Length)
 		{
 			size := people.Length;
 		}
         pos := size-1;
+=======
+>>>>>>> 99ec51ea5db7f31d349cbb7174c8f6d00c6273e6
     }
 
 
@@ -66,8 +77,8 @@ class PersonDB
         }
     }
 
-    method find(i:int) returns (p:Person)
-    requires 0 < i < size    
+    method find(i:int) returns (p:Person?)
+    requires 0 <= i < size < people.Length  
  	{
  		p := new Person(); //Returns an empty person because it can't be null
  		if( people[i] != null)
@@ -93,7 +104,7 @@ class Person
 
  	function Transient():bool
  	reads this
- 	{ con == null && id == -1 }
+ 	{ id == -1 }
  	
  	function Persistent():bool
  	reads this
@@ -108,6 +119,7 @@ class Person
  	{ id := -1; name := new char[0]; age := 0; con := null; }
 
  	method save(c:PersonDB)
+<<<<<<< HEAD
  	modifies this
 	modifies c.people, c`size
  	requires this.name.Length > 0
@@ -142,6 +154,35 @@ class Person
  	modifies this
 	modifies c.people
  	requires Persistent()
+=======
+    requires c != null ==> this.con != null
+ 	modifies this`id, this`con, con.people
+ 	requires this.name.Length > 0
+ 	requires this.age >= 0
+    requires c.size < c.people.Length
+ 	requires c.size < c.people.Length
+ 	requires Transient() || Persitent()
+ 	ensures Persitent()
+ 	{	
+        var pos:= this.id;
+        this.con := c;
+        if(this.id < 0)
+        {
+ 	       pos := con.add();
+        }
+     	con.people[pos].setName(this.name);
+     	con.people[pos].setAge(this.age);
+     	this.id := pos;
+         	
+ 	}
+
+ 	method delete()
+    requires this.con != null
+    requires 0 <= this.id < this.con.people.Length
+    requires this.con.people[this.id] != null
+ 	modifies this`con, this`id, con.people
+ 	requires Persitent()
+>>>>>>> 99ec51ea5db7f31d349cbb7174c8f6d00c6273e6
  	ensures Transient()
  	{
  		//con.delete(this.id);
@@ -158,17 +199,28 @@ class Person
  	}
 
  	method close(c:PersonDB)
+<<<<<<< HEAD
 	modifies this
  	requires Persistent()
+=======
+    modifies this`con
+ 	requires Persitent()
+>>>>>>> 99ec51ea5db7f31d349cbb7174c8f6d00c6273e6
  	ensures Detatched()
  	{
  		this.con := null;
  	}
 
  	method update(c:PersonDB)
+<<<<<<< HEAD
  	modifies this
 	requires Detatched()
  	ensures Persistent()
+=======
+ 	modifies this`con
+    requires Detatched()
+ 	ensures Persitent()
+>>>>>>> 99ec51ea5db7f31d349cbb7174c8f6d00c6273e6
  	{
  		this.con := c;
  	}

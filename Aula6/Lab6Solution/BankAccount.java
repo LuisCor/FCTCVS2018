@@ -5,16 +5,15 @@ CVS course - Integrated Master in Computer Science and Engineering
 */
 
 /*@
-predicate AccountInv(BankAccount c; int limit, int balance, int id) =
- 	c.balance |-> balance
- 	&*& c.climit |-> limit
- 	&*& c.accountid |-> id
- 	&*& 0 <= id
- 	&*& 0 <= limit
- 	&*& 0 <= balance + limit
+predicate AccountInv(BankAccount c; int limit, int balance, int id) = 
+      c.balance |-> balance
+  &*& c.climit |-> limit
+  &*& c.accountid |-> id
+  &*& 0 <= id
+  &*& 0 <= limit
+  &*& 0 <= balance + limit 
 ;
-@*/ 
-
+@*/
 
 public class BankAccount {
 
@@ -23,25 +22,25 @@ public class BankAccount {
   int accountid;
 
   public BankAccount(int id)
-  //@ requires 0 <= id;
-  //@ ensures AccountInv(this,0,0,id);
+    //@ requires 0 <= id;
+    //@ ensures  AccountInv(this,0,0,id);
   {
       balance = 0;
       climit = 0;
       accountid = id;
-      //@ close AccountInv(this,_,_,_);
+      // @ close AccountInv(this,_,_,_);
   }
 
   public void deposit(int v)
-  //@ requires AccountInv(this, ?c, ?b, ?id) &*& 0 <= v;
-  //@ ensures AccountInv(this, c, b+v, id); 
+    //@ requires AccountInv(this,?c,?b,?id) &*& 0 <= v;
+    //@ ensures  AccountInv(this,c,b+v,id);
   {
-  	balance += v;
+    balance += v;
   }
 
   public void withdraw(int v)
-  //@ requires AccountInv(this, ?c, ?b, ?id) &*& v >= 0 &*& v <= b + c;
-  //@ ensures AccountInv(this, c, b - v,id);
+    //@ requires AccountInv(this,?c,?b,?id) &*& 0 <= v &*& v <= b + c ;
+    //@ ensures  AccountInv(this,c,b-v,id);
   {
      balance  -= v;
   }
@@ -56,37 +55,36 @@ public class BankAccount {
   public int getbalance()
     //@ requires AccountInv(this,?c,?b,_);
     //@ ensures  AccountInv(this,c,b,_) &*& result == b;
-
   {
      return balance;
   }
 
   public void setclimit(int cl)
-  //@ requires AccountInv(this, ?c, ?b, ?id) &*& cl >= 0 &*& 0 <= b + cl;
-  //@ ensures AccountInv(this, cl, b, id);
+    //@ requires AccountInv(this,?c,?b,?id) &*& 0 <= cl &*& 0 <= b + cl;
+    //@ ensures  AccountInv(this,cl,b,id);  
   {
       climit = cl;
   }
 
   public int getclimit()
-  //@ requires AccountInv(this, ?c, ?b, ?id);
-  //@ ensures AccountInv(this, c, b, id) &*& result == c;
+    //@ requires AccountInv(this,?c,?b,?id);
+    //@ ensures  AccountInv(this,c,b,id) &*& result == c;  
   {
      return climit;
   }
 
   static void main()
-  //@ requires true;
-  //@ ensures true;
+    //@ requires true;
+    //@ ensures  true;
   {
     BankAccount b1 = new BankAccount(123);
     b1.deposit(1000);
     b1.setclimit(500);
     b1.withdraw(1450);
-    
+    //@ open AccountInv(b1,_,_,_);
     int n = b1.getcode();
-    
-    if(b1.getbalance() >= -200)
+    //@ assert n == 123;
+    if( b1.getbalance() >= -200 )
     	b1.setclimit(200);
   }
 }

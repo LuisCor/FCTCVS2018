@@ -1,9 +1,9 @@
 
 /*@
-    predicate SensorInv(SensorInt s; int m, int n) =
-       s.value |-> ?v &*&
-       s.max |-> m &*&
-       s.min |-> n &*&
+    predicate SensorInv(SensorInt s; int value) =
+       s.value |-> value &*&
+       s.max |-> ?m &*&
+       s.min |-> ?n &*&
        m > n;
 @*/
 
@@ -29,15 +29,15 @@ class SensorInt
     
     
     int getMax()
-    //@ requires SensorInv(this, ?max, ?min);
-    //@ ensures SensorInv(this, max, min);
+    //@ requires SensorInv(this, ?v);
+    //@ ensures SensorInv(this, v);
     { 
         return this.max;
     }  
     
     int getMin() 
-    //@ requires SensorInv(this, ?max, ?min);
-    //@ ensures SensorInv(this, max, min);    
+    //@ requires SensorInv(this, ?v);
+    //@ ensures SensorInv(this, v);    
     { 
         return this.min;
     }  
@@ -47,7 +47,9 @@ class SensorInt
         return this.value;
     }    
     
-    void set(int value) 
+    void set(int value)
+    //@ requires SensorInv(this, ?v);
+    //@ ensures SensorInv(this, v); 
     {
         this.value = value;
     }

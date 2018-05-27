@@ -1,43 +1,57 @@
+import java.util.Random;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 /*@
-    predicate SensorInv(SensorInt s; int value) =
-       s.value |-> value &*&
+    predicate SensorInv(SensorInt s;) =
+       s.value |-> ?v &*&
        s.max |-> ?m &*&
        s.min |-> ?n &*&
-       m > n;
+       m > n
+       //s.mon |-> ?l &*&
+       //l != null
+       ;
 @*/
 
 
 class SensorInt
 {
+
+    ////@ predicate pre() = SensorInv(this);
+    ////@ predicate post() = true;
+
     int value;
     int min;
     int max;
     
+    ReentrantLock mon;
     Thread th;
+
     
     static final int SAMPLING = 3;
     
     SensorInt(int min, int max) 
+    //@ requires max > min;
+    //@ ensures SensorInv(this);
     {
         this.min = min;
         this.max = max;
         this.value = min;
-        this.th = new Thread(new Probe(this));
-        this.th.start();
+        //this.th = new Thread(new Probe(this));
+        //this.th.start();
     }
     
     
     int getMax()
-    //@ requires SensorInv(this, ?v);
-    //@ ensures SensorInv(this, v);
+    //@ requires SensorInv(this);
+    //@ ensures true;
     { 
         return this.max;
     }  
     
     int getMin() 
-    //@ requires SensorInv(this, ?v);
-    //@ ensures SensorInv(this, v);    
+    //@ requires SensorInv(this);
+    //@ ensures true;    
     { 
         return this.min;
     }  
@@ -48,17 +62,13 @@ class SensorInt
     }    
     
     void set(int value)
-    //@ requires SensorInv(this, ?v);
-    //@ ensures SensorInv(this, v); 
+    //@ requires SensorInv(this);
+    //@ ensures SensorInv(this); 
     {
         this.value = value;
     }
     
-    public static void main(String args[]) throws InterruptedException 
-    ////@ requires System_out(?o) &*& o != null; 
-    ////@ ensures true;
-    //This needs to be enabled for the prints to work, but this is being a bitch and
-    // it aint working
+    public static void main(String args[]) throws InterruptedException
     {
         SensorInt s = new SensorInt(0,10);
         
